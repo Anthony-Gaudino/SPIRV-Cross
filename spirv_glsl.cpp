@@ -4803,8 +4803,13 @@ string CompilerGLSL::to_expression(uint32_t id, bool register_expression_read)
 			auto &dec = ir.meta[var.self].decoration;
 			if (dec.builtin)
 				return builtin_to_glsl(dec.builtin_type, var.storage);
-			else
-				return to_name(id);
+			else {
+				if (var.casttype) {
+					return "(" + type_to_glsl(get<SPIRType>(get<SPIRType>(var.casttype).parent_type))  + ")" + to_name(id);
+				} else {
+					return to_name(id);
+				}
+			}
 		}
 	}
 

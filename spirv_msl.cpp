@@ -2292,6 +2292,9 @@ void CompilerMSL::add_plain_variable_to_interface_block(StorageClass storage, co
 		if (storage == StorageClassInput)
 		{
 			type_id = ensure_correct_input_type(var.basetype, locn, comp, 0, meta.strip_array);
+			if (type_id != var.basetype) {
+				var.casttype = var.basetype;
+			}
 			var.basetype = type_id;
 
 			type_id = get_pointee_type_id(type_id);
@@ -2460,7 +2463,11 @@ void CompilerMSL::add_composite_variable_to_interface_block(StorageClass storage
 			uint32_t comp = get_decoration(var.self, DecorationComponent);
 			if (storage == StorageClassInput)
 			{
-				var.basetype = ensure_correct_input_type(var.basetype, locn, comp, 0, meta.strip_array);
+				auto type_id = ensure_correct_input_type(var.basetype, locn, comp, 0, meta.strip_array);
+				if (type_id != var.basetype) {
+					var.casttype = var.basetype;
+				}
+				var.basetype = type_id;
 				uint32_t mbr_type_id = ensure_correct_input_type(usable_type->self, locn, comp, 0, meta.strip_array);
 				if (storage == StorageClassInput && pull_model_inputs.count(var.self))
 					ib_type.member_types[ib_mbr_idx] = build_msl_interpolant_type(mbr_type_id, is_noperspective);

@@ -1097,7 +1097,7 @@ struct SPIRVariable : IVariant
 	bool loop_variable_enable = false;
 
 	SPIRFunction::Parameter *parameter = nullptr;
-
+	TypeID casttype = 0;
 	SPIRV_CROSS_DECLARE_CLONE(SPIRVariable)
 };
 
