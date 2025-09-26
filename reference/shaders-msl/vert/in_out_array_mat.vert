@@ -78,14 +78,14 @@ struct main0_in
 };
 
 static inline __attribute__((always_inline))
-void write_deeper_in_function(thread float4x4& outTransModel, constant UBO& ubo, thread float4& color, thread spvUnsafeArray<float4, 3> (&colors))
+void write_deeper_in_function(thread float4x4& outTransModel, constant UBO& ubo, thread float4& color, thread spvUnsafeArray<float4, 3>& colors)
 {
     outTransModel[1].y = ubo.lodBias;
     color = colors[2];
 }
 
 static inline __attribute__((always_inline))
-void write_in_function(thread float4x4& outTransModel, constant UBO& ubo, thread float4& color, thread spvUnsafeArray<float4, 3> (&colors), thread float3& inNormal)
+void write_in_function(thread float4x4& outTransModel, constant UBO& ubo, thread float4& color, thread spvUnsafeArray<float4, 3>& colors, thread float3& inNormal)
 {
     outTransModel[2] = float4(inNormal, 1.0);
     write_deeper_in_function(outTransModel, ubo, color, colors);
@@ -105,7 +105,7 @@ vertex main0_out main0(main0_in in [[stage_in]], constant UBO& ubo [[buffer(0)]]
     inViewMat[2] = in.inViewMat_2;
     inViewMat[3] = in.inViewMat_3;
     out.gl_Position = (ubo.projection * ubo.model) * float4(in.inPos, 1.0);
-    out.outPos = float3((ubo.model * float4(in.inPos, 1.0)).xyz);
+    out.outPos = (ubo.model * float4(in.inPos, 1.0)).xyz;
     out.outNormal = float3x3(float3(float3(ubo.model[0].x, ubo.model[0].y, ubo.model[0].z)), float3(float3(ubo.model[1].x, ubo.model[1].y, ubo.model[1].z)), float3(float3(ubo.model[2].x, ubo.model[2].y, ubo.model[2].z))) * in.inNormal;
     out.outLodBias = ubo.lodBias;
     outTransModel = transpose(ubo.model) * inViewMat;

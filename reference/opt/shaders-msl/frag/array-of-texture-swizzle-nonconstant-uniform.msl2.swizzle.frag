@@ -5,38 +5,6 @@
 
 using namespace metal;
 
-struct UBO
-{
-    uint index;
-};
-
-struct UBO2
-{
-    uint index2;
-};
-
-struct main0_out
-{
-    float4 FragColor [[color(0)]];
-};
-
-struct main0_in
-{
-    float2 vUV [[user(locn0)]];
-};
-
-template<typename T> struct spvRemoveReference { typedef T type; };
-template<typename T> struct spvRemoveReference<thread T&> { typedef T type; };
-template<typename T> struct spvRemoveReference<thread T&&> { typedef T type; };
-template<typename T> inline constexpr thread T&& spvForward(thread typename spvRemoveReference<T>::type& x)
-{
-    return static_cast<thread T&&>(x);
-}
-template<typename T> inline constexpr thread T&& spvForward(thread typename spvRemoveReference<T>::type&& x)
-{
-    return static_cast<thread T&&>(x);
-}
-
 enum class spvSwizzle : uint
 {
     none = 0,
@@ -84,6 +52,26 @@ inline T spvTextureSwizzle(T x, uint s)
 {
     return spvTextureSwizzle(vec<T, 4>(x, 0, 0, 1), s).x;
 }
+
+struct UBO
+{
+    uint index;
+};
+
+struct UBO2
+{
+    uint index2;
+};
+
+struct main0_out
+{
+    float4 FragColor [[color(0)]];
+};
+
+struct main0_in
+{
+    float2 vUV [[user(locn0)]];
+};
 
 fragment main0_out main0(main0_in in [[stage_in]], constant uint* spvSwizzleConstants [[buffer(30)]], constant UBO& uUBO [[buffer(0)]], constant UBO2& _50 [[buffer(1)]], array<texture2d<float>, 4> uSampler [[texture(0)]], array<sampler, 4> uSamplerSmplr [[sampler(0)]])
 {
