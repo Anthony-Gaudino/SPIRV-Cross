@@ -24,7 +24,7 @@ struct main0_patchOut
 struct main0_in
 {
     float3 vPatchPosBase;
-    ushort2 m_433;
+    ushort2 m_431;
 };
 
 static inline __attribute__((always_inline))
