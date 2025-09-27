@@ -14091,6 +14091,30 @@ string CompilerMSL::member_attribute_qualifier(const SPIRType &type, uint32_t in
 			return join(" [[", loc_qual, "]]");
 	}
 
+	// Geometry-as-mesh path special case: even though for_mesh_pipeline is true, we still
+	// need to tag Position with [[position]] in the vertex output struct used as the V
+	// template parameter to metal::mesh<...>. The regular logic above suppresses qualifiers
+	// when for_mesh_pipeline is set for geometry (so we don't emit attribute(N) for user varyings),
+	// but suppressing [[position]] causes Metal to reject the mesh vertex type. If we detect an
+	// output struct member which is BuiltInPosition and qualifiers were skipped, emit it now.
+	if (execution.model == ExecutionModelGeometry && msl_options.for_mesh_pipeline &&
+		type.storage == StorageClassOutput && is_member_builtin(type, index, &builtin) && builtin == BuiltInPosition)
+	{
+		return string(" [[") + builtin_qualifier(builtin) + "]]" + (mbr_type.array.empty() ? "" : " ");
+	}
+
+	// Geometry-as-mesh special case for user varyings: we still want to preserve [[user(locnN)]]
+	// attributes on non-builtin output members so hashing/regression matches reference shaders
+	// and downstream stages (if any) can rely on stable semantics. Original logic suppressed
+	// all semantics when for_mesh_pipeline was enabled, which removed these attributes.
+	if (execution.model == ExecutionModelGeometry && msl_options.for_mesh_pipeline &&
+		type.storage == StorageClassOutput && !is_member_builtin(type, index, &builtin))
+	{
+		string loc_qual = member_location_attribute_qualifier(type, index);
+		if (!loc_qual.empty())
+			return join(" [[", loc_qual, "]]" );
+	}
+
 	if (execution.model == ExecutionModelVertex && msl_options.vertex_for_tessellation && type.storage == StorageClassOutput)
 	{
 		// For this type of shader, we always arrange for it to capture its

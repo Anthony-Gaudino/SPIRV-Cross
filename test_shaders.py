@@ -117,14 +117,13 @@ def print_msl_compiler_version():
         pass
 
 def path_to_msl_standard(shader):
-    # Prefer explicit highest versions first.
     if '.msl32.' in shader:
         return '-std=metal3.2'
     if '.msl31.' in shader:
         return '-std=metal3.1'
-    if '.msl3.' in shader:
+    elif '.msl3.' in shader:
         return '-std=metal3.0'
-    if '.ios.' in shader:
+    elif '.ios.' in shader:
         if '.msl2.' in shader:
             return '-std=ios-metal2.0'
         elif '.msl21.' in shader:
@@ -142,12 +141,6 @@ def path_to_msl_standard(shader):
         else:
             return '-std=ios-metal1.2'
     else:
-        if '.msl32.' in shader:
-            return '-std=metal3.2'
-        if '.msl31.' in shader:
-            return '-std=metal3.1'
-        if '.msl3.' in shader:
-            return '-std=metal3.0'
         if '.msl2.' in shader:
             return '-std=macos-metal2.0'
         elif '.msl21.' in shader:
@@ -1084,21 +1077,8 @@ def main():
         sys.stderr.write('Parallel execution is disabled when using the flags --update, --malisc or --force-no-external-validation\n')
         args.parallel = False
 
-    args.msl22 = False
-    args.msl23 = False
-    args.msl24 = False
-    args.msl30 = False
-    args.msl31 = False
-    args.msl32 = False
     if args.msl:
         print_msl_compiler_version()
-        # Query support progressively.
-        args.msl22 = msl_compiler_supports_version('-std=macos-metal2.2')
-        args.msl23 = msl_compiler_supports_version('-std=macos-metal2.3')
-        args.msl24 = msl_compiler_supports_version('-std=macos-metal2.4')
-        args.msl30 = msl_compiler_supports_version('-std=metal3.0')
-        args.msl31 = msl_compiler_supports_version('-std=metal3.1')
-        args.msl32 = msl_compiler_supports_version('-std=metal3.2')
 
     backend = 'glsl'
     if (args.msl or args.metal):
