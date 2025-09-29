@@ -6336,7 +6336,10 @@ void CompilerMSL::emit_custom_templates()
 		"thread", "constant", "device", "threadgroup", "threadgroup_imageblock", "ray_data", "object_data"
 	};
 
-	for (const auto &spv_func : spv_function_implementations)
+	// Iterate over a local copy to avoid issues if spv_function_implementations
+	// is modified during emission (e.g., add_spv_func_and_recompile()).
+	std::vector<SPVFuncImpl> spv_funcs_copy(spv_function_implementations.begin(), spv_function_implementations.end());
+	for (const auto &spv_func : spv_funcs_copy)
 	{
 		switch (spv_func)
 		{
@@ -6627,7 +6630,10 @@ void CompilerMSL::emit_custom_functions()
 		spv_function_implementations.insert(SPVFuncImplGetSwizzle);
 	}
 
-	for (const auto &spv_func : spv_function_implementations)
+	// Iterate over a local copy to avoid issues if spv_function_implementations
+	// is modified while emitting functions.
+	std::vector<SPVFuncImpl> spv_funcs_copy2(spv_function_implementations.begin(), spv_function_implementations.end());
+	for (const auto &spv_func : spv_funcs_copy2)
 	{
 		switch (spv_func)
 		{
